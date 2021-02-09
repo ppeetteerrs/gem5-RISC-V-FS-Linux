@@ -112,11 +112,11 @@ qemu-system-riscv64 -nographic -smp 2 -machine virt -bios none -kernel $OUT/bbl2
 ```bash
 # Single core
 cd $G5
-build/RISCV/gem5.opt --debug-flags= -d logs -re configs/example/fs.py --kernel=$OUT/bbl --caches --mem-size=256MB --mem-type=DDR4_2400_8x8 --cpu-type=AtomicSimpleCPU --disk-image=$OUT/riscv_disk
+build/RISCV/gem5.opt -d logs -re configs/example/fs.py --kernel=$OUT/bbl --caches --mem-size=256MB --mem-type=DDR4_2400_8x8 --cpu-type=AtomicSimpleCPU --disk-image=$OUT/riscv_disk
 
 # Multicore
 cd $G5
-build/RISCV/gem5.opt --debug-flags= -d logs -re configs/example/fs.py --kernel=$OUT/bbl2 --caches --mem-size=256MB --mem-type=DDR4_2400_8x8 --cpu-type=AtomicSimpleCPU --disk-image=$OUT/riscv_disk --num-cpus=2
+build/RISCV/gem5.opt -d logs -re configs/example/fs.py --kernel=$OUT/bbl2 --caches --mem-size=256MB --mem-type=DDR4_2400_8x8 --cpu-type=AtomicSimpleCPU --disk-image=$OUT/riscv_disk --num-cpus=2
 
 # Single core with remote GDB
 build/RISCV/gem5.opt --debug-flags=RiscvClint -d logs -re configs/example/fs.py --kernel=$OUT/bbl --caches --mem-size=256MB --mem-type=DDR4_2400_8x8 --cpu-type=AtomicSimpleCPU --param 'system.cpu[0].wait_for_remote_gdb = True' --disk-image=$OUT/riscv_disk
