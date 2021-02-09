@@ -7,6 +7,5 @@ src
 bin
 sysroot
 vmlinux
-riscv_disk
 bbl
 bbl2
