@@ -1,0 +1,12 @@
+.vscode
+lib
+libexec
+riscv64*
+share
+src
+bin
+sysroot
+vmlinux
+riscv_disk
+bbl
+bbl2
