@@ -1,10 +1,17 @@
 # gem5 RISC-V Full System Linux Guide
 
+[Setup and Installation](.)
+
+[Running RISC-V FS Linux](FULL_SYSTEM.md)
+
+[Building and Running PARSEC 3.0](PARSEC.md)
+
+
 ## 1. Recommended Environment Setup
 
 ### 1.1 Folder Structure
-```txt
-📦~/ (or any working directory)
+```text
+📦~ (or any working directory)
  ┣ 📂gem5
  ┗ 📂riscv
    ┣ 📂bin: RISC-V tool binaries (e.g. GNU-toolchain, QEMU etc.)
@@ -21,7 +28,7 @@
 ```
 
 ### 1.2 Bash Environment
-
+Add these environment variables for easier navigation:
 ```bash
 # Add to ~/.bashrc, replace paths if desired
 export RISCV="~/riscv"
@@ -84,7 +91,7 @@ sudo apt install -y build-essential git m4 scons zlib1g zlib1g-dev libprotobuf-d
 
 ## 3.2 Building gem5 Binaries
 
-Refer to the [official doc](https://www.gem5.org/documentation/general_docs/building) for more advanced options.
+Refer to the [official documentation](https://www.gem5.org/documentation/general_docs/building) for more advanced options.
 
 ```bash
 git clone https://gem5.googlesource.com/public/gem5 $G5
@@ -99,6 +106,7 @@ cd G5 && scons build/RISCV/gem5.opt -j$(nproc)
 ```
 
 ## 4. Linux System
+You can download the prebuilt binaries from the [resources](/resources) folder. They should work out of the box. In case you want to build them yourself, follow the instructions below:
 
 ### 4.1 Disk Image (UCanLinux)
 Personally, I manually edit the kernel.config file to set `CONFIG_DEBUG_KERNEL=y`. I am not sure if that has any effect on the RISC-V Linux Kernel but just in case. 
