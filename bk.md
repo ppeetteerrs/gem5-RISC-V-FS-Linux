@@ -1,104 +1,66 @@
-# gem5 RISC-V Full System Linux Guide
+# gem5 RISC-V FS Linux Setup Guide
 
-## 1. Recommended Environment Setup
-
-### 1.1 Folder Structure
-```txt
-📦~/ (or any working directory)
- ┣ 📂gem5
- ┗ 📂riscv
-   ┣ 📂bin: RISC-V tool binaries (e.g. GNU-toolchain, QEMU etc.)
-   ┣ 📂logs: gem5 simulation logs
-   ┣ 📂out: build outputs (kernel / bootloader / devicetree / disk image)
-   ┗ 📂src
-     ┣ 📂linux: Linux kernel repo
-     ┣ 📂pk: RISC-V proxy kernel (bbl bootloader)
-     ┣ 📂qemu: QEMU emulator
-     ┣ 📂toolchain: RISC-V GNU toolchain
-     ┗ 📂ucanlinux: UCanLinux disk image
- ┗ 📂benchmarks
-   ┗ 📂parsec: PARSEC 3.0 benchmark for RISC-V
-```
-
-### 1.2 Bash Environment
-
+## 1. Shell Environment
+First, add these lines to your `~/.<shell>rc` file:
 ```bash
-# Add to ~/.bashrc, replace paths if desired
-export RISCV="~/riscv"
+export RISCV=<riscv_working_dir>
 export PATH=$RISCV/bin:$PATH
-export G5="~/gem5"
+export G5=<gem5_repo_path>
 export SRC=$RISCV/src
 export OUT=$RISCV/out
 ```
 
-Setup by running:
+Then, create the directories:
 ```bash
 mkdir -p $RISCV/bin
 mkdir -p $RISCV/out
 mkdir -p $RISCV/src
 ```
 
-## 2 Tools and Libraries
-
-### 2.1 RISC-V GNU Toolchain
-
-The RISC-V GNU Toolchain is used for cross-compiling and debugging RISC-V code.
-
+Clone this repo for pre-built binaries and images and devicetree (or you can build them from scratch).
 ```bash
-sudo apt-get install -y autoconf automake autotools-dev curl python3 libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev
-git clone https://github.com/riscv/riscv-gnu-toolchain $SRC/toolchain
-cd $SRC/toolchain
-./configure --prefix=$RISCV --enable-multilib
-make linux -j$(nproc)
-# You will need this to compile things like PARSEC and riscv-tests
-make newlib -j$(nproc)
+git clone https://github.com/ppeetteerrs/gem5-RISC-V-FS-Linux.git $OUT
 ```
 
-> If you encounter problems building the RISC-V toolchain (e.g. failure to download riscv-newlib due to proxy), replace `url = git://sourceware.org/git/newlib-cygwin.git` in `.gitmodules` with `url = ../riscv-newlib`
+## 2. RISC-V Libraries
+
+### 2.1 RISC-V GNU Toolchain
+```bash
+sudo apt-get install -y autoconf automake autotools-dev curl python3 libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev
+cd $SRC
+git clone https://github.com/riscv/riscv-gnu-toolchain toolchain
+cd toolchain
+./configure --prefix=$RISCV
+make linux -j$(nproc)
+```
 
 ### 2.2 QEMU
-
-QEMU can be used to quickly verify that binaries / disk images / kernels are valid before running / debugging in gem5.
-
 ```bash
 sudo apt-get install -y git libglib2.0-dev libfdt-dev libpixman-1-dev zlib1g-dev ninja-build
-git clone https://git.qemu.org/git/qemu.git $SRC/qemu
-cd $SRC/qemu
+cd $SRC
+git clone https://git.qemu.org/git/qemu.git qemu
+cd qemu
 ./configure --target-list=riscv64-softmmu --prefix=$RISCV
 make -j$(nproc)
 make install
 ```
 
-# 3 gem5 Installation
-
-## 3.1 Dependencies
-**Ubuntu 18.04**:
+## 3. gem5
 ```bash
-sudo apt install build-essential git m4 scons zlib1g zlib1g-dev libprotobuf-dev protobuf-compiler libprotoc-dev libgoogle-perftools-dev python-dev python-six python libboost-all-dev pkg-config python3 python3-dev python3-six
-```
+# Ubuntu 18.04
+sudo apt install build-essential git m4 scons zlib1g zlib1g-dev libprotobuf-dev protobuf-compiler libprotoc-dev libgoogle-perftools-dev python-dev python-six python libboost-all-dev pkg-config
 
-**Ubuntu 20.04**:
-```bash
+# Ubuntu 20.04
 sudo apt install -y build-essential git m4 scons zlib1g zlib1g-dev libprotobuf-dev protobuf-compiler libprotoc-dev libgoogle-perftools-dev python3-dev python3-six python-is-python3 libboost-all-dev pkg-config
-```
 
-## 3.2 Building gem5 Binaries
-
-Refer to the [official doc](https://www.gem5.org/documentation/general_docs/building) for more advanced options.
-
-```bash
 git clone https://gem5.googlesource.com/public/gem5 $G5
+cd $G5
 
-# Uncomment if you want to contribute to gem5
-# cd $G5 && git checkout develop
-
-# Uncomment if you have anaconda3 installed (or non-deault python interpreter)
-# export PATH=/usr/bin:$PATH
-
-cd G5 && scons build/RISCV/gem5.opt -j$(nproc)
+# prepend PATH to use default Python3 (if anaconda is installed)
+export PATH=/usr/bin:$PATH && scons build/RISCV/gem5.opt -j$(nproc)
 ```
 
-## 4. Linux System
+## 4. Full System Linux
 
 ### 4.1 Disk Image (UCanLinux)
 Personally, I manually edit the kernel.config file to set `CONFIG_DEBUG_KERNEL=y`. I am not sure if that has any effect on the RISC-V Linux Kernel but just in case. 
