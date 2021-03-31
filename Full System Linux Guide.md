@@ -6,7 +6,7 @@ You are assumed to have the following correctly built:
 - bbl binary at `$OUT/bbl`
   - linux kernel at `$OUT/vmlinux`
 - disk image at `$OUT/riscv_disk`
-- In gem5: using `configs/example/riscv/fs_linux.py` or replace it with [`resources/fs_linux.py`](./resources/fs_linux.py) for a bit more flexibility
+- In gem5: using `configs/example/riscv/fs_linux.py` or replace it with [`resources/fs_linux.py`](./resources/fs_linux.py) for a bit more flexibility (will be merged by next release)
 
 ## 1.2 Running
 Please customize the following command according to your likings (binary type, debug flags, cpu type etc.):
@@ -28,11 +28,82 @@ target remote :7000 # CPU 1 will be at 7001 etc.
 
 # 2 Python Configuration
 
-# 3 Other Setups
+This section goes through the Python configurations which are relevant to RISC-V full system.
+
+## 2.1 HiFive Platform
+The HiFive platform is constructed based on SiFive's HiFive board series. By default, it contains the interrupt controllers CLINT and PLIC at addresses `0x2000000` and `0xc000000` respectively. It also has a default UART terminal attached at `0x10000000`.
+```python
+system.platform = HiFive()
+```
+
+## 2.2 CLINT
+CLINT is responsible for timer interrupts (through setting MMIO `mtimecmp`) and software interrupts. The `mtime` register in CLINT is incremented by an external signal (interrupt pin). By default, it is connected to a dummy `RiscvRTC` object which generates a fixed-frequency clock signal but provides no RTC MMIO interface for setting kernel wall clock time.
+```python
+system.platform.rtc = RiscvRTC(frequency=Frequency("100MHz"))
+system.platform.clint.int_pin = system.platform.rtc.int_pin
+```
+
+Currently, it is necessary to manually change the default `10MHz` frequency under `src/dev/riscv/HiFive.py` and **rebuild gem5** to generate the correct timebase frequency in the DTS. In the future this should be simplified. Check under `<path_to_gem5_logs>/device.dts` after simulation starts to confirm.
+```python
+# Under class HiFive
+def generateDeviceTree(self, state):
+    cpus_node = FdtNode("cpus")
+    cpus_node.append(FdtPropertyWords("timebase-frequency", [10000000]))
+    yield cpus_node
+```
+
+## 2.3 Disk Image
+If you use [`resources/fs_linux.py`](./resources/fs_linux.py), a disk image can be optionally passed in. The disk image is wrapped as a VirtIOMMIO device. Multiple disks can be added if desired, following the format below:
+
+```python
+image = CowDiskImage(child=RawDiskImage(read_only=True), read_only=False)
+image.child.image_file = mdesc.disks()[0]
+system.platform.disk = MmioVirtIO(
+    vio=VirtIOBlock(image=image),
+    interrupt_id=0x8,
+    pio_size=4096,
+    pio_addr=0x10008000
+)
+```
+
+## 2.4 PLIC and Buses
+Connect the off-chip devices to the system's `iobus`, connect on-chip devices to `membus`:
+```python
+system.bridge.ranges = system.platform._off_chip_ranges()
+system.platform.attachOnChipIO(system.membus)
+system.platform.attachOffChipIO(system.iobus)
+```
+
+Route off-chip `PlicIntDevice` (see `src/dev/riscv/PlicDevice.py`) have their interrupts through PLIC (use `Platform::postPciInt(int line)` to raise interrupt to PLIC). `attachPlic()` register their `interrupt_id` to PLIC and configure the number of interrupt sources in the devicetree:
+```python
+system.platform.attachPlic()
+```
+
+## 2.5 PMAChecker
+The PMAChecker adds flags to translated virtual addresses (e.g. uncacheability). Configure the uncacheable memory ranges (or any custom-flag ranges by extending `PMAChecker` class) **after** CPUs have been added to the system:
+
+```python
+uncacheable_range = [
+    *system.platform._on_chip_ranges(),
+    *system.platform._off_chip_ranges()
+]
+
+for cpu in system.cpu:
+    cpu.mmu.pma_checker = PMAChecker(uncacheable=uncacheable_range)
+```
+
+## 2.6 DTB Generation
+Call `generateDtb(system)` to generate dtb and embed it into the workload binary (this might be merged into `HiFive` class in the future).
+
+# 3 Command Line Options and Custom Setup
+
 ## 3.1 Custom Devicetree
+Supply `--dtb-filename=<path_to_dtb_file>` to avoid automatic DTB generation. Configuration in dtb should match the system setup in Python. It might be easier to automatically generate a DTB from Python then make the necessary changes (e.g. new devices / change settings) to get a custom dtb.
 
 ## 3.2 Devicetree in Bootloader
+If devicetree is already embedded in bootloader binary (bootloader should handling setting the register `a1` to point to devicetree), use `--bare-metal`. For example, this can be done by building bbl with the `--with-dts` option.
 
 ## 3.3 No Disk Image
-
+If you use [`resources/fs_linux.py`](./resources/fs_linux.py), disk image is optional.
 ## 3.4 DioSix Hypervisor (To-Do)
+Currently gem5 full system does not support H-mode. But machine-mode hypervisors like Diosix can be booted. However, some bugfixes might be involved.

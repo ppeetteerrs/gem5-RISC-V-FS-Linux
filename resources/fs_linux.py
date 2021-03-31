@@ -283,7 +283,7 @@ if not options.bare_metal:
         kernel_cmd = [
             "console=ttyS0",
             "root=/dev/vda",
-            "ro"
+            "rw"
         ]
         system.workload.command_line = " ".join(kernel_cmd)
 
