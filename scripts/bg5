@@ -1,0 +1,28 @@
+#! /bin/bash
+
+TYPE="debug"
+
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+key="$1"
+
+case $key in
+    -o)
+    TYPE="opt"
+    shift
+    ;;
+    -d)
+    TYPE="debug"
+    shift
+    ;;
+    *)
+    POSITIONAL+=("$1")
+    shift
+    ;;
+esac
+done
+
+cd $G5
+
+scons build/RISCV/gem5.$TYPE -j8
