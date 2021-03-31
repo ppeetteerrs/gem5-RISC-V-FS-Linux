@@ -1,12 +1,13 @@
 # gem5 RISC-V Full System Linux Guide
 
-[Setup and Installation (here)](.)
+[Setup and Installation (here)](README.md)
 
-[Running RISC-V FS Linux]("Full System Linux Guide.md")
+[Running RISC-V FS Linux](Full%20System%20Linux%20Guide.md)
 
-[Building and Running PARSEC 3.0](PARSEC.md)
+[Building and Running PARSEC 3.0](PARSEC%20Guide.md)
 
-## 1. Recommended Environment Setup
+## 1. Recommended Setup
+This section recommends a development environment setup. The subsequent sections will assume that this setup is used. Please change according to your personal preferences.
 
 ### 1.1 Folder Structure
 ```text
@@ -111,7 +112,7 @@ You can download the prebuilt binaries from the [resources](/resources) folder. 
 
 ### 4.1 Disk Image (UCanLinux)
 - Personally, I manually edit the `kernel.config` file to set `CONFIG_DEBUG_KERNEL=y`. I am not sure if that has any effect on the Linux kernel but just in case.
-- [UCanLinux](https://github.com/UCanLinux/riscv64-sample) repo has a pre-built disk image. The [disk image]() in this repo contains the PARSEC 3.0 `blackscholes` benchmark, see [PARSEC.md](PARSEC.md) for more info.
+- [UCanLinux](https://github.com/UCanLinux/riscv64-sample) repo has a pre-built disk image. The [disk image]() in this repo contains the PARSEC 3.0 `blackscholes` benchmark, see [PARSEC Guide.md](PARSEC%20Guide.md) for more info.
 
 ```bash
 git clone https://github.com/UCanLinux/riscv64-sample.git $SRC/ucanlinux
@@ -133,7 +134,7 @@ cp vmlinux $OUT
 
 ### 4.3 Berkeley Bootloader (bbl)
 - The Berkeley Bootloader is used to load the Linux kernel, see the [SiFive blog](https://www.sifive.com/blog/all-aboard-part-6-booting-a-risc-v-linux-kernel) for its inner workings.
-- bbl expects the hart uid and devicetree address to be stored in registers `a0` and `a1` respectively when loaded. The devicetree generation and register value settings are handled by gem5, see [FULL_SYSTEM.md](FULL_SYSTEM.md) for more info.
+- bbl expects the hart uid and devicetree address to be stored in registers `a0` and `a1` respectively when loaded. The devicetree generation and register value settings are handled by gem5, see [Full System Linux Guide.md](Full%20System%20Linux%20Guide.md) for more info.
 ```bash
 sudo apt-get install -y device-tree-compiler
 git clone https://github.com/riscv/riscv-pk.git $SRC/pk

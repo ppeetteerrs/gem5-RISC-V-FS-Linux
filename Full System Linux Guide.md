@@ -6,7 +6,7 @@ You are assumed to have the following correctly built:
 - bbl binary at `$OUT/bbl`
   - linux kernel at `$OUT/vmlinux`
 - disk image at `$OUT/riscv_disk`
-- In gem5: using `configs/example/riscv/fs_linux.py` or replace it with `resources/fs_linux.py` for more flexibility
+- In gem5: using `configs/example/riscv/fs_linux.py` or replace it with [`resources/fs_linux.py`](./resources/fs_linux.py) for a bit more flexibility
 
 ## 1.2 Running
 Please customize the following command according to your likings (binary type, debug flags, cpu type etc.):
