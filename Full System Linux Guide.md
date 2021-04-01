@@ -107,3 +107,7 @@ If devicetree is already embedded in bootloader binary (bootloader should handli
 If you use [`resources/fs_linux.py`](./resources/fs_linux.py), disk image is optional.
 ## 3.4 DioSix Hypervisor (To-Do)
 Currently gem5 full system does not support H-mode. But machine-mode hypervisors like Diosix can be booted. However, some bugfixes might be involved.
+
+
+
+Checkpoint restore
