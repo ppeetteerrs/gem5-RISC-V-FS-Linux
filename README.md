@@ -4,7 +4,7 @@
 
 [Running RISC-V FS Linux](Full%20System%20Linux%20Guide.md)
 
-[Building and Running PARSEC 3.0](PARSEC%20Guide.md)
+[Building and Running Benchmarks](Benchmark%20Guide.md)
 
 ## 1. Recommended Setup
 This section recommends a development environment setup. The subsequent sections will assume that this setup is used. Please change according to your personal preferences.
@@ -31,9 +31,9 @@ This section recommends a development environment setup. The subsequent sections
 Add these environment variables for easier navigation:
 ```bash
 # Add to ~/.bashrc, replace paths if desired
-export RISCV="~/riscv"
+export RISCV=~/riscv
 export PATH=$RISCV/bin:$PATH
-export G5="~/gem5"
+export G5=~/gem5
 export SRC=$RISCV/src
 export OUT=$RISCV/out
 ```
@@ -104,15 +104,16 @@ git clone https://gem5.googlesource.com/public/gem5 $G5
 # Uncomment if you have anaconda3 installed (or non-deault python interpreter)
 # export PATH=/usr/bin:$PATH
 
-cd G5 && scons build/RISCV/gem5.opt -j$(nproc)
+cd $G5 && scons build/RISCV/gem5.opt -j$(nproc)
 ```
 
 ## 4. Linux System
-You can download the prebuilt binaries from the [resources](/resources) folder. They should work out of the box. In case you want to build them yourself, follow the instructions below:
+You can download the prebuilt binaries from the [prebuilt](/prebuilt) folder. They should work out of the box (copy them in `$OUT` directory). In case you want to build them yourself, follow the instructions below:
 
 ### 4.1 Disk Image (UCanLinux)
 - Personally, I manually edit the `kernel.config` file to set `CONFIG_DEBUG_KERNEL=y`. I am not sure if that has any effect on the Linux kernel but just in case.
-- [UCanLinux](https://github.com/UCanLinux/riscv64-sample) repo has a pre-built disk image. The [disk image]() in this repo contains the PARSEC 3.0 `blackscholes` benchmark, see [PARSEC Guide.md](PARSEC%20Guide.md) for more info.
+- [UCanLinux](https://github.com/UCanLinux/riscv64-sample) repo has a pre-built disk image, which is the same as [this](./prebuilt/riscv_disk)
+- The [other disk](./prebuilt/riscv_parsec_disk) in this repo contains the PARSEC 3.0 `blackscholes` benchmark, see [Benchmark Guide.md](Benchmark%20Guide.md) for more info.
 
 ```bash
 git clone https://github.com/UCanLinux/riscv64-sample.git $SRC/ucanlinux
@@ -183,3 +184,4 @@ There are two scripts in [scripts](./scripts) that can be placed into `$RISCV/bi
 
 - `bg5`: build gem5 binary
 - `rg5`: run gem5 RISC-V full system
+

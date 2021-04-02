@@ -55,6 +55,4 @@ done
 
 cd $G5
 
-build/RISCV/gem5.$TYPE $FLAGS $START -d $RISCV/logs -re configs/example/riscv/fs_linux.py --kernel=$OUT/bbl --caches --mem-size=128MB --mem-type=DDR4_2400_8x8 --cpu-type=$CPU --disk-image=$OUT/riscv_disk ${POSITIONAL[@]}
-
-# build/RISCV/gem5.$TYPE $FLAGS $START -d $RISCV/logs -re configs/example/riscv/fs_linux.py --kernel=$OUT/diosix --caches --mem-size=2048MB --mem-type=DDR4_2400_8x8 --cpu-type=$CPU --disk-image=$OUT/riscv_disk ${POSITIONAL[@]}
+build/RISCV/gem5.$TYPE $FLAGS $START -d $RISCV/logs -re configs/example/riscv/fs_linux.py --kernel=$OUT/bbl --caches --mem-size=256MB --mem-type=DDR4_2400_8x8 --cpu-type=$CPU --disk-image=$OUT/riscv_disk ${POSITIONAL[@]}

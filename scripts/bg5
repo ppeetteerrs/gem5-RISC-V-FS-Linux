@@ -24,5 +24,6 @@ esac
 done
 
 cd $G5
-
-scons build/RISCV/gem5.$TYPE -j8
+# Uncomment if you have anaconda3 installed (or non-deault python interpreter)
+# export PATH=/usr/bin:$PATH
+scons build/RISCV/gem5.$TYPE -j($nproc)
